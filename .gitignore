@@ -1,0 +1,17 @@
+# 忽略原始遥感影像与大型矢量（用户克隆后一键下载）
+data/raw_rasters/
+data/processed/*.geojson
+!data/processed/.gitkeep
+
+# 忽略数据库持久化卷
+pgdata/
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 保留结果与图表！
+results/*.csv
+results/plots/*.png

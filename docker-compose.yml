@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: bench_postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: benchdb
+      POSTGRES_USER: benchuser
+      POSTGRES_PASSWORD: benchpassword
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+      - ./configs/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./data:/data
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+
+  runner:
+    build:
+      context: .
+      dockerfile: runner.Dockerfile
+    container_name: bench_runner
+    volumes:
+      - .:/workspace
+      - ./data:/data
+    environment:
+      - DATABASE_URL=postgresql://benchuser:benchpassword@db:5432/benchdb
+      - CPL_VSIL_CURL_ALLOWED_EXTENSIONS=.tif
+      - GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
+    entrypoint: ["tail", "-f", "/dev/null"]
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
